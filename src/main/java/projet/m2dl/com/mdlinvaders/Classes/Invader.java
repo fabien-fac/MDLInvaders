@@ -15,7 +15,7 @@ import projet.m2dl.com.mdlinvaders.R;
 public class Invader {
 
     public final int SIZE_INVADER = 50;
-    private final int MIN_TOP = 10;
+    private final int MIN_TOP = 50;
     private final int MIN_LEFT = 10;
     private final int STRAF_LEFT = 30;
     private final int WIDTH_BETWEEN_INVADERS = 20;
