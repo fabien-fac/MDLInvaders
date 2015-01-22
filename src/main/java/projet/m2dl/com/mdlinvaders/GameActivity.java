@@ -57,6 +57,8 @@ public class GameActivity extends Activity implements SensorEventListener {
      */
     private SystemUiHider mSystemUiHider;
 
+    private final int FLAT_INCLINATION = 25;
+
     private RelativeLayout rootView;
     private ArrayList<Invader> invaders = new ArrayList<>();
     private final int NB_INVADERS_ROW = 4;
@@ -215,13 +217,14 @@ public class GameActivity extends Activity implements SensorEventListener {
         g[2] = (float) (g[2] / norm_Of_g);
 
         int inclination = (int) Math.round(Math.toDegrees(Math.acos(g[2])));
-        if (inclination < 25 || inclination > 155)
+
+        if (inclination < (FLAT_INCLINATION - 10) || inclination > (FLAT_INCLINATION + 10))
         {
-            System.out.println("device is flat");
+            System.out.println("device is flat : " + inclination);
         }
         else
         {
-            System.out.println("device is not flat");
+            System.out.println("device is not flat : " + inclination);
         }
     }
 
