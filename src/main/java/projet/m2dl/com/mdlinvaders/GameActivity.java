@@ -75,7 +75,6 @@ public class GameActivity extends Activity implements SensorEventListener{
     private final int BOMB_DELAY = 10000;
 
     private RelativeLayout rootView;
-    private RelativeLayout layoutInvader;
     private SpaceShip spaceShip;
     private DisplayMetrics metrics;
     private ArrayList<Invader> invaders = new ArrayList<>();
@@ -94,6 +93,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private int bonus = 1;
     private TextView txtScore;
     private TextView txtBonus;
+    private ImageView spaceShipView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +102,8 @@ public class GameActivity extends Activity implements SensorEventListener{
         setContentView(R.layout.activity_game);
 
         rootView = (RelativeLayout) findViewById(R.id.fullscreen_content);
-        layoutInvader = (RelativeLayout) findViewById(R.id.layoutInvaders);
+        spaceShipView = (ImageView) findViewById(R.id.viewSpaceShip);
+
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
         mSystemUiHider = SystemUiHider.getInstance(this, rootView, HIDER_FLAGS);
@@ -157,7 +158,7 @@ public class GameActivity extends Activity implements SensorEventListener{
         // while interacting with the UI.
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        spaceShip = new SpaceShip(this, (ImageView)rootView.findViewById(R.id.layoutSpaceShip).findViewById(R.id.viewSpaceShip), metrics);
+        spaceShip = new SpaceShip(this, spaceShipView, metrics);
 
         displayInvaders();
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
@@ -318,7 +319,7 @@ public class GameActivity extends Activity implements SensorEventListener{
         while (invaderIterator.hasNext()){
             Invader invader = invaderIterator.next();
             if(invader.isInvaderDestroyed()){
-                layoutInvader.removeView(invader.getImageView());
+                rootView.removeView(invader.getImageView());
                 invaderIterator.remove();
             }
             else{
@@ -329,7 +330,7 @@ public class GameActivity extends Activity implements SensorEventListener{
             Invader invader = new Invader(this, i);
             invaders.add(invader);
             //rootView.addView(invader.getImageView());
-            layoutInvader.addView(invader.getImageView());
+            rootView.addView(invader.getImageView());
         }
     }
 
@@ -422,13 +423,12 @@ public class GameActivity extends Activity implements SensorEventListener{
                 if(laser.isInvaderTouched(invader)){
                     score = invader.destroyInvader(score, bonus);
                     txtScore.setText("Score : "+String.valueOf(score));
-                    rootView.removeView(invader.getImageView());
-                    invaderIterator.remove();
                     touched = true;
                 }
             }
 
             if(touched){
+                rootView.removeView(laser.getImageView());
                 lazorIterator.remove();
             }
         }
