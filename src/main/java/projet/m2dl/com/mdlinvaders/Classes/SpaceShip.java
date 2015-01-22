@@ -15,10 +15,10 @@ import projet.m2dl.com.mdlinvaders.R;
 public class SpaceShip {
     ImageView imgSpaceShip;
     Context context;
-    private static final int SIZE_SPACESHIP = 75;
+    public static final int SIZE_SPACESHIP = 75;
     private static final int MARGIN_BOTTOM_SPACESHIP = 25;
     private DisplayMetrics metrics;
-    private int marginLeftSpaceShip, marginTopSpaceship, localX, localY;
+    private int marginLeftSpaceShip, marginTopSpaceship;
 
     public SpaceShip(Context context, ImageView imgSpaceShip, DisplayMetrics metrics){
         this.context = context;
@@ -36,19 +36,27 @@ public class SpaceShip {
         public boolean onTouch(View arg0, MotionEvent arg1) {
             RelativeLayout.LayoutParams layout = (RelativeLayout.LayoutParams) imgSpaceShip.getLayoutParams();
             if (arg1.getAction()==MotionEvent.ACTION_DOWN) {
-                localX = (int)arg1.getX();
+                marginLeftSpaceShip = (int)arg1.getX();
                 imgSpaceShip.bringToFront();
                 return true;
             }
             if (arg1.getAction()==MotionEvent.ACTION_MOVE) {
-                if ((arg1.getRawX() - localX)>0 && (arg1.getRawX() - localX)<(metrics.widthPixels-SIZE_SPACESHIP)){
-                    layout.leftMargin = (int) arg1.getRawX() - localX;
+                if ((arg1.getRawX() - marginLeftSpaceShip)>0 && (arg1.getRawX() - marginLeftSpaceShip)<(metrics.widthPixels-SIZE_SPACESHIP)){
+                    layout.leftMargin = (int) arg1.getRawX() - marginLeftSpaceShip;
                 }
             }
             imgSpaceShip.setLayoutParams(layout);
             return true;
         }
     };
+
+    public int getMarginLeftSpaceShip() {
+        return marginLeftSpaceShip;
+    }
+
+    public int getMarginTopSpaceship() {
+        return marginTopSpaceship;
+    }
 
    /* public ImageView getImageView(){
         return this.imgSpaceShip;

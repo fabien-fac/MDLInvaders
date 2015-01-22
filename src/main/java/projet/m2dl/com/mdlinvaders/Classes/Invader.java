@@ -14,7 +14,7 @@ import projet.m2dl.com.mdlinvaders.R;
 
 public class Invader {
 
-    private final int SIZE_INVADER = 50;
+    public final int SIZE_INVADER = 50;
     private final int MIN_TOP = 10;
     private final int MIN_LEFT = 10;
     private final int STRAF_LEFT = 30;
@@ -118,5 +118,13 @@ public class Invader {
         }
 
         return invader;
+    }
+
+    public int getLeft() {
+        return left;
+    }
+
+    public int getTop() {
+        return top;
     }
 }

@@ -13,17 +13,14 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import projet.m2dl.com.mdlinvaders.Classes.Invader;
+import projet.m2dl.com.mdlinvaders.Classes.Lazor;
 import projet.m2dl.com.mdlinvaders.Classes.SpaceShip;
 import projet.m2dl.com.mdlinvaders.util.SystemUiHider;
 
@@ -68,12 +65,15 @@ public class GameActivity extends Activity implements SensorEventListener{
     private final int FLAT_INCLINATION = 25;
     private final int TIME_UPDATE_INVADERS = 2000;
     private final int NB_INVADERS_ROW = 4;
+    private final int TIME_UPDATE_LASERS = 2000;
 
     private RelativeLayout rootView;
     private SpaceShip spaceShip;
     private DisplayMetrics metrics;
     private ArrayList<Invader> invaders = new ArrayList<>();
+    private ArrayList<Lazor> lasers = new ArrayList<>();
     Handler handlerInvaders = new Handler();
+    Handler handlerLasers = new Handler();
     private SensorManager sensorManager;
     private int time_update_invaders = TIME_UPDATE_INVADERS;
     private MediaRecorder mRecorder = null;
@@ -195,6 +195,7 @@ public class GameActivity extends Activity implements SensorEventListener{
 
     private void launchTimer(){
         handlerInvaders.postDelayed(invadersRunnable, time_update_invaders);
+        handlerLasers.postDelayed(lasersRunnable, TIME_UPDATE_LASERS);
     }
 
     private Runnable invadersRunnable = new Runnable() {
@@ -202,6 +203,15 @@ public class GameActivity extends Activity implements SensorEventListener{
         public void run() {
             displayInvaders();
             handlerInvaders.postDelayed(invadersRunnable, time_update_invaders);
+        }
+    };
+
+    private Runnable lasersRunnable = new Runnable() {
+        @Override
+        public void run() {
+            displayLasers();
+            detectColisions();
+            handlerInvaders.postDelayed(lasersRunnable, TIME_UPDATE_LASERS);
         }
     };
 
@@ -274,5 +284,43 @@ public class GameActivity extends Activity implements SensorEventListener{
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    private void displayLasers(){
+        Iterator<Lazor> lazorIterator = lasers.iterator();
+        while (lazorIterator.hasNext()){
+            Lazor laser = lazorIterator.next();
+            laser.updatePosition();
+        }
+
+        Lazor laser = new Lazor(this, spaceShip.getMarginLeftSpaceShip(), spaceShip.getMarginTopSpaceship());
+        lasers.add(laser);
+        rootView.addView(laser.getImageView());
+    }
+
+    private void detectColisions(){
+
+        Iterator<Lazor> lazorIterator = lasers.iterator();
+        while (lazorIterator.hasNext()){
+
+            Lazor laser = lazorIterator.next();
+
+            Iterator<Invader> invaderIterator = invaders.iterator();
+            boolean touched = false;
+            while (invaderIterator.hasNext() && !touched){
+
+                Invader invader = invaderIterator.next();
+
+                if(laser.isInvaderTouched(invader)){
+                    invader.destroyInvader();
+                    invaderIterator.remove();
+                    touched = true;
+                }
+            }
+
+            if(touched){
+                lazorIterator.remove();
+            }
+        }
     }
 }
