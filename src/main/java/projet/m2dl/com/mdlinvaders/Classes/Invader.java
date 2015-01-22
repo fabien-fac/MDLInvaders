@@ -35,7 +35,9 @@ public class Invader {
 
         left = getInitalLeftFromPosition(position);
 
-        setLayout();
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(SIZE_INVADER, SIZE_INVADER);
+        layoutParams.setMargins(left,top,0,0);
+        imageView.setLayoutParams(layoutParams);
     }
 
 
@@ -50,19 +52,19 @@ public class Invader {
 
         switch (val){
             case 0:
-                invader = R.drawable.invaders1;
+                invader = R.drawable.invaders12;
                 break;
             case 1:
-                invader = R.drawable.invaders2;
+                invader = R.drawable.invaders22;
                 break;
             case 2:
-                invader = R.drawable.invaders3;
+                invader = R.drawable.invaders32;
                 break;
             case 3:
-                invader = R.drawable.invaders4;
+                invader = R.drawable.invaders42;
                 break;
             default:
-                invader = R.drawable.invaders1;
+                invader = R.drawable.invaders12;
         }
 
         return invader;
@@ -73,7 +75,7 @@ public class Invader {
     }
 
     private void setLayout(){
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(SIZE_INVADER, SIZE_INVADER);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
         layoutParams.setMargins(left,top,0,0);
         imageView.setLayoutParams(layoutParams);
     }

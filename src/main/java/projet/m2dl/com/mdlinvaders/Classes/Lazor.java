@@ -28,7 +28,9 @@ public class Lazor {
         left = getInitalLeftFromPosition(leftShipPosition);
         top = getInitalTopFromPosition(topShipPosition);
 
-        setLayout();
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(SIZE_LASER, SIZE_LASER);
+        layoutParams.setMargins(left,top,0,0);
+        imageView.setLayoutParams(layoutParams);
     }
 
     private int getInitalLeftFromPosition(int leftShipPosition){
@@ -40,7 +42,7 @@ public class Lazor {
     }
 
     private void setLayout(){
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(SIZE_LASER, SIZE_LASER);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) imageView.getLayoutParams();
         layoutParams.setMargins(left,top,0,0);
         imageView.setLayoutParams(layoutParams);
     }

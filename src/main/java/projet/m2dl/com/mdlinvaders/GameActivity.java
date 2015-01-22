@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -64,8 +63,8 @@ public class GameActivity extends Activity implements SensorEventListener{
 
     private final int FLAT_INCLINATION = 25;
     private final int TIME_UPDATE_INVADERS = 2000;
-    private final int NB_INVADERS_ROW = 4;
-    private final int TIME_UPDATE_LASERS = 2000;
+    private final int NB_INVADERS_ROW = 3;
+    private final int TIME_UPDATE_LASERS = 200;
 
     private RelativeLayout rootView;
     private SpaceShip spaceShip;
@@ -77,6 +76,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private SensorManager sensorManager;
     private int time_update_invaders = TIME_UPDATE_INVADERS;
     private MediaRecorder mRecorder = null;
+    private int cptLaser = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,6 +166,7 @@ public class GameActivity extends Activity implements SensorEventListener{
      * system UI. This is to prevent the jarring behavior of controls going away
      * while interacting with activity UI.
      */
+    /*
     View.OnTouchListener mDelayHideTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -175,6 +176,7 @@ public class GameActivity extends Activity implements SensorEventListener{
             return false;
         }
     };
+    */
 
     Handler mHideHandler = new Handler();
     Runnable mHideRunnable = new Runnable() {
@@ -293,9 +295,14 @@ public class GameActivity extends Activity implements SensorEventListener{
             laser.updatePosition();
         }
 
-        Lazor laser = new Lazor(this, spaceShip.getMarginLeftSpaceShip(), spaceShip.getMarginTopSpaceship());
-        lasers.add(laser);
-        rootView.addView(laser.getImageView());
+        if(cptLaser == 4){
+            Lazor laser = new Lazor(this, spaceShip.getMarginLeftSpaceShip(), spaceShip.getMarginTopSpaceship());
+            lasers.add(laser);
+            rootView.addView(laser.getImageView());
+            cptLaser = 0;
+        }
+
+        cptLaser++;
     }
 
     private void detectColisions(){
