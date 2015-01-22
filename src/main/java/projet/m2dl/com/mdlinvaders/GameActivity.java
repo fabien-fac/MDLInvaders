@@ -2,6 +2,8 @@ package projet.m2dl.com.mdlinvaders;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,6 +14,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -20,6 +24,8 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import projet.m2dl.com.mdlinvaders.Classes.Invader;
 import projet.m2dl.com.mdlinvaders.Classes.Lazor;
@@ -332,7 +338,18 @@ public class GameActivity extends Activity implements SensorEventListener{
 
     public void isGameOver(Invader invader){
         if (invader.getTop()+invader.SIZE_INVADER > spaceShip.getMarginTopSpaceship()){
-            //System.out.println("FIN DE LA PARTIE");
+            AlertDialog.Builder msgTouchBuilder = new AlertDialog.Builder(this);
+            msgTouchBuilder.setTitle("Fin de la partie");
+            msgTouchBuilder.setMessage("Score : " + score);
+            msgTouchBuilder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog,int id) {
+                    handlerAudioRecord.removeCallbacks(audioRecordRunnable);
+                    handlerInvaders.removeCallbacks(invadersRunnable);
+                    handlerLasers.removeCallbacks(lasersRunnable);
+                }
+            });
+            AlertDialog msgTouch = msgTouchBuilder.create();
+            msgTouch.show();
         }
     }
 
@@ -424,7 +441,7 @@ public class GameActivity extends Activity implements SensorEventListener{
 
                 if(laser.isInvaderTouched(invader)){
                     score = invader.destroyInvader(score, bonus);
-                    txtScore.setText("Score : "+String.valueOf(score));
+                    txtScore.setText("Score : " + String.valueOf(score));
                     touched = true;
                 }
             }
