@@ -22,4 +22,15 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:src="@drawable/title2"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Large Text"
+        android:id="@+id/score"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="#ffffff"
+        android:background="#000000"/>
 </RelativeLayout>

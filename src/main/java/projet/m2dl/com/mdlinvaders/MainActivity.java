@@ -1,21 +1,30 @@
 package projet.m2dl.com.mdlinvaders;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.*;
 
 
 public class MainActivity extends ActionBarActivity {
 
+    TextView score;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        score = (TextView) findViewById(R.id.score);
+
         getSupportActionBar().hide();
+
+        SharedPreferences settings = getSharedPreferences("scoreFile", 0);
+        int score2 = settings.getInt("score", 0);
+        score.setText("Meilleur score : " + score2);
     }
 
 
@@ -45,4 +54,5 @@ public class MainActivity extends ActionBarActivity {
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }
+
 }

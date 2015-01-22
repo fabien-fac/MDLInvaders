@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -343,6 +344,10 @@ public class GameActivity extends Activity implements SensorEventListener{
 
     public void isGameOver(Invader invader){
         if (invader.getTop()+invader.SIZE_INVADER > spaceShip.getMarginTopSpaceship() && !isGameOver){
+            SharedPreferences settings = getSharedPreferences("scoreFile", 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putInt("score", score);
+            editor.commit();
             isGameOver = true;
             AlertDialog.Builder msgTouchBuilder = new AlertDialog.Builder(this);
             msgTouchBuilder.setTitle("Fin de la partie");
