@@ -6,12 +6,15 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -31,6 +34,7 @@ import projet.m2dl.com.mdlinvaders.util.SystemUiHider;
  *
  * @see SystemUiHider
  */
+
 public class GameActivity extends Activity implements SensorEventListener{
     /**
      * Whether or not the system UI should be auto-hidden after
@@ -55,8 +59,6 @@ public class GameActivity extends Activity implements SensorEventListener{
      */
     private static final int HIDER_FLAGS = SystemUiHider.FLAG_HIDE_NAVIGATION;
 
-    private static final int SIZE_SPACESHIP = 60;
-    private static final int MARGIN_BOTTOM_SPACESHIP = 50;
 
     /**
      * The instance of the {@link SystemUiHider} for this activity.
@@ -65,18 +67,16 @@ public class GameActivity extends Activity implements SensorEventListener{
 
     private final int FLAT_INCLINATION = 25;
     private final int TIME_UPDATE_INVADERS = 2000;
+    private final int NB_INVADERS_ROW = 4;
 
     private RelativeLayout rootView;
     private SpaceShip spaceShip;
-    private ImageView imgSpaceShip;
-    private int marginLeftSpaceShip, marginTopSpaceship;
-    private float lastXSpaceShip;
     private DisplayMetrics metrics;
     private ArrayList<Invader> invaders = new ArrayList<>();
-    private final int NB_INVADERS_ROW = 4;
     Handler handlerInvaders = new Handler();
     private SensorManager sensorManager;
     private int time_update_invaders = TIME_UPDATE_INVADERS;
+    private MediaRecorder mRecorder = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,12 +136,9 @@ public class GameActivity extends Activity implements SensorEventListener{
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-
-
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-        placeSpaceShip();
+        spaceShip = new SpaceShip(this, (ImageView)rootView.findViewById(R.id.viewSpaceShip), metrics);
 
         displayInvaders();
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
@@ -152,44 +149,6 @@ public class GameActivity extends Activity implements SensorEventListener{
 
         launchTimer();
     }
-
-    public void placeSpaceShip(){
-        imgSpaceShip = (ImageView) rootView.findViewById(R.id.viewSpaceShip);
-        imgSpaceShip.setOnTouchListener(moveSpaceShip);
-        marginLeftSpaceShip = (metrics.widthPixels/2)-(SIZE_SPACESHIP/2);
-        marginTopSpaceship = metrics.heightPixels-SIZE_SPACESHIP;
-        lastXSpaceShip = (metrics.widthPixels/2);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(SIZE_SPACESHIP, SIZE_SPACESHIP);
-        layoutParams.setMargins(marginLeftSpaceShip, marginTopSpaceship,0,0);
-        imgSpaceShip.setLayoutParams(layoutParams);
-    }
-
-    public View.OnTouchListener moveSpaceShip = new View.OnTouchListener() {
-       public boolean onTouch(View arg0, MotionEvent arg1) {
-            switch (arg1.getAction())
-            {
-                case MotionEvent.ACTION_MOVE:
-                {
-                    // ici votre code...
-
-                    float deltaX = arg1.getX() - lastXSpaceShip;
-                        marginLeftSpaceShip += deltaX;
-                        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(SIZE_SPACESHIP, SIZE_SPACESHIP);
-                        //System.out.println("deltaX : " + deltaX);
-                        //System.out.println("marginleft : " + marginLeftSpaceShip);
-                        System.out.println("ArgX : " + arg1.getX());
-                        //System.out.println("lastX : " + lastXSpaceShip);
-                        System.out.println("PosSpaceship : " +  (int)(arg1.getX()-(SIZE_SPACESHIP/2)));
-                        //((RelativeLayout.LayoutParams)imgSpaceShip.getLayoutParams()).setMargins(marginLeftSpaceShip, marginTopSpaceship, 0, 0);
-                        layoutParams.setMargins((int) (arg1.getX()-(SIZE_SPACESHIP/2)), marginTopSpaceship, 0, 0);
-                        imgSpaceShip.setLayoutParams(layoutParams);
-                        lastXSpaceShip = arg1.getX();
-                        imgSpaceShip.invalidate(); // pour invalider l'image et forcer un rappel à la methode onDraw de la classe.
-                    }
-                }
-            return true;
-        }
-    };
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
