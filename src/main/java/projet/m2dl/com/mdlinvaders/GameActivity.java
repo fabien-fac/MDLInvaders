@@ -3,6 +3,7 @@ package projet.m2dl.com.mdlinvaders;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -89,6 +90,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private MediaRecorder mRecorder = null;
     private boolean isGameOver = false;
     private int cptLaser = 0;
+    private Context context = this;
 
     private boolean bombAvailable = true;
     private int score = 0;
@@ -290,7 +292,7 @@ public class GameActivity extends Activity implements SensorEventListener{
         for (Invader curInvader : invaders){
             score = curInvader.destroyInvader(score, bonus);
         }
-        txtScore.setText("Score : "+String.valueOf(score));
+        txtScore.setText("Score : " + String.valueOf(score));
     }
 
     private void launchTimer(){
@@ -302,7 +304,9 @@ public class GameActivity extends Activity implements SensorEventListener{
         @Override
         public void run() {
             displayInvaders();
-            handlerInvaders.postDelayed(invadersRunnable, time_update_invaders);
+            if(!isGameOver) {
+                handlerInvaders.postDelayed(invadersRunnable, time_update_invaders);
+            }
         }
     };
 
@@ -311,7 +315,9 @@ public class GameActivity extends Activity implements SensorEventListener{
         public void run() {
             displayLasers();
             detectColisions();
-            handlerInvaders.postDelayed(lasersRunnable, TIME_UPDATE_LASERS);
+            if(!isGameOver){
+                handlerInvaders.postDelayed(lasersRunnable, TIME_UPDATE_LASERS);
+            }
         }
     };
 
@@ -336,16 +342,14 @@ public class GameActivity extends Activity implements SensorEventListener{
     }
 
     public void isGameOver(Invader invader){
-        if (invader.getTop()+invader.SIZE_INVADER > spaceShip.getMarginTopSpaceship()){
+        if (invader.getTop()+invader.SIZE_INVADER > spaceShip.getMarginTopSpaceship() && !isGameOver){
             isGameOver = true;
             AlertDialog.Builder msgTouchBuilder = new AlertDialog.Builder(this);
             msgTouchBuilder.setTitle("Fin de la partie");
             msgTouchBuilder.setMessage("Score : " + score);
             msgTouchBuilder.setPositiveButton("OK",new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog,int id) {
-                    handlerAudioRecord.removeCallbacks(audioRecordRunnable);
-                    handlerInvaders.removeCallbacks(invadersRunnable);
-                    handlerLasers.removeCallbacks(lasersRunnable);
+                    ((GameActivity)context).finish();
                 }
             });
             AlertDialog msgTouch = msgTouchBuilder.create();
