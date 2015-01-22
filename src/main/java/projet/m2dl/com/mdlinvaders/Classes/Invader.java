@@ -102,7 +102,6 @@ public class Invader {
         imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), getRandomExplosion()));
         isDestroy = true;
         int result = score+(10*bonus);
-        System.out.println("score : " + result);
         return result;
     }
 

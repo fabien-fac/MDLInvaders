@@ -75,6 +75,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private final int BOMB_DELAY = 10000;
 
     private RelativeLayout rootView;
+    private RelativeLayout layoutInvader;
     private SpaceShip spaceShip;
     private DisplayMetrics metrics;
     private ArrayList<Invader> invaders = new ArrayList<>();
@@ -101,7 +102,7 @@ public class GameActivity extends Activity implements SensorEventListener{
         setContentView(R.layout.activity_game);
 
         rootView = (RelativeLayout) findViewById(R.id.fullscreen_content);
-
+        layoutInvader = (RelativeLayout) findViewById(R.id.layoutInvaders);
         // Set up an instance of SystemUiHider to control the system UI for
         // this activity.
         mSystemUiHider = SystemUiHider.getInstance(this, rootView, HIDER_FLAGS);
@@ -156,7 +157,7 @@ public class GameActivity extends Activity implements SensorEventListener{
         // while interacting with the UI.
         metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        spaceShip = new SpaceShip(this, (ImageView)rootView.findViewById(R.id.viewSpaceShip), metrics);
+        spaceShip = new SpaceShip(this, (ImageView)rootView.findViewById(R.id.layoutSpaceShip).findViewById(R.id.viewSpaceShip), metrics);
 
         displayInvaders();
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
@@ -317,7 +318,7 @@ public class GameActivity extends Activity implements SensorEventListener{
         while (invaderIterator.hasNext()){
             Invader invader = invaderIterator.next();
             if(invader.isInvaderDestroyed()){
-                rootView.removeView(invader.getImageView());
+                layoutInvader.removeView(invader.getImageView());
                 invaderIterator.remove();
             }
             else{
@@ -327,9 +328,9 @@ public class GameActivity extends Activity implements SensorEventListener{
         for(int i=0; i<NB_INVADERS_ROW; i++){
             Invader invader = new Invader(this, i);
             invaders.add(invader);
-            rootView.addView(invader.getImageView());
+            //rootView.addView(invader.getImageView());
+            layoutInvader.addView(invader.getImageView());
         }
-
     }
 
     @Override
