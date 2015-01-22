@@ -37,7 +37,6 @@ public class SpaceShip {
             RelativeLayout.LayoutParams layout = (RelativeLayout.LayoutParams) imgSpaceShip.getLayoutParams();
             if (arg1.getAction()==MotionEvent.ACTION_DOWN) {
                 marginLeftSpaceShip = (int)arg1.getX();
-                imgSpaceShip.bringToFront();
                 return true;
             }
             if (arg1.getAction()==MotionEvent.ACTION_MOVE) {

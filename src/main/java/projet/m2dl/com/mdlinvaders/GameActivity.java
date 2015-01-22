@@ -12,11 +12,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import projet.m2dl.com.mdlinvaders.Classes.Invader;
 import projet.m2dl.com.mdlinvaders.Classes.Lazor;
@@ -65,6 +72,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private final int TIME_UPDATE_INVADERS = 2000;
     private final int NB_INVADERS_ROW = 3;
     private final int TIME_UPDATE_LASERS = 200;
+    private final int BOMB_DELAY = 10000;
 
     private RelativeLayout rootView;
     private SpaceShip spaceShip;
@@ -72,11 +80,19 @@ public class GameActivity extends Activity implements SensorEventListener{
     private ArrayList<Invader> invaders = new ArrayList<>();
     private ArrayList<Lazor> lasers = new ArrayList<>();
     Handler handlerInvaders = new Handler();
+    Handler handlerAudioRecord = new Handler();
     Handler handlerLasers = new Handler();
     private SensorManager sensorManager;
     private int time_update_invaders = TIME_UPDATE_INVADERS;
     private MediaRecorder mRecorder = null;
+
     private int cptLaser = 0;
+
+    private boolean bombAvailable = true;
+    private int score = 0;
+    private int bonus = 1;
+    private TextView txtScore;
+    private TextView txtBonus;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +149,8 @@ public class GameActivity extends Activity implements SensorEventListener{
             }
         });
 
+        txtScore = (TextView) rootView.findViewById(R.id.textview_score);
+        txtBonus = (TextView) rootView.findViewById(R.id.textview_bonus);
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
@@ -147,7 +165,42 @@ public class GameActivity extends Activity implements SensorEventListener{
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
+        startRecord();
+
+        launchAudioRecordTimer();
         launchTimer();
+    }
+
+    public void startRecord() {
+        if (mRecorder == null) {
+            mRecorder = new MediaRecorder();
+            mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mRecorder.setOutputFile("/dev/null");
+            try {
+                mRecorder.prepare();
+                mRecorder.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void stop() {
+        if (mRecorder != null) {
+            mRecorder.stop();
+            mRecorder.release();
+            mRecorder = null;
+        }
+    }
+
+    public double getAmplitude() {
+        if (mRecorder != null)
+            return  mRecorder.getMaxAmplitude();
+        else
+            return 0;
+
     }
 
     @Override
@@ -195,6 +248,48 @@ public class GameActivity extends Activity implements SensorEventListener{
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private void launchBombDisabledTimer(){
+        Toast.makeText(GameActivity.this, "Bomb disable",
+                Toast.LENGTH_LONG).show();
+        handlerAudioRecord.postDelayed(BombDisabledRunnable, BOMB_DELAY);
+    }
+
+    private Runnable BombDisabledRunnable = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(GameActivity.this, "Bomb available",
+                            Toast.LENGTH_LONG).show();
+            bombAvailable=true;
+        }
+    };
+
+    private void launchAudioRecordTimer(){
+        handlerAudioRecord.postDelayed(audioRecordRunnable, 100);
+    }
+
+    private Runnable audioRecordRunnable = new Runnable() {
+        @Override
+        public void run() {
+            double volume = getAmplitude();
+            if (bombAvailable){
+                if (volume > 25000){
+                    bombAvailable = false;
+                    launchBombDisabledTimer();
+                    destroyAllInvaders();
+                    System.out.println("Volume : " + volume);
+                }
+            }
+           handlerAudioRecord.postDelayed(audioRecordRunnable, 100);
+        }
+    };
+
+    private void destroyAllInvaders(){
+        for (Invader curInvader : invaders){
+            score = curInvader.destroyInvader(score, bonus);
+        }
+        txtScore.setText("Score : "+String.valueOf(score));
+    }
+
     private void launchTimer(){
         handlerInvaders.postDelayed(invadersRunnable, time_update_invaders);
         handlerLasers.postDelayed(lasersRunnable, TIME_UPDATE_LASERS);
@@ -218,11 +313,11 @@ public class GameActivity extends Activity implements SensorEventListener{
     };
 
     private void displayInvaders(){
-
         Iterator<Invader> invaderIterator = invaders.iterator();
         while (invaderIterator.hasNext()){
             Invader invader = invaderIterator.next();
             if(invader.isInvaderDestroyed()){
+                rootView.removeView(invader.getImageView());
                 invaderIterator.remove();
             }
             else{
@@ -257,10 +352,10 @@ public class GameActivity extends Activity implements SensorEventListener{
 
         int inclination = (int) Math.round(Math.toDegrees(Math.acos(g[2])));
 
-        calculateNewTimer(inclination);
+        calculateNewTimerAndBonus(inclination);
     }
 
-    private void calculateNewTimer(int inclination) {
+    private void calculateNewTimerAndBonus(int inclination) {
         if (inclination < FLAT_INCLINATION)
         {
             time_update_invaders = TIME_UPDATE_INVADERS;
@@ -269,16 +364,21 @@ public class GameActivity extends Activity implements SensorEventListener{
         {
             if(inclination < FLAT_INCLINATION + 5){
                 time_update_invaders = TIME_UPDATE_INVADERS - 300;
+                bonus = 1;
             }
             else if (inclination < FLAT_INCLINATION + 10){
                 time_update_invaders = TIME_UPDATE_INVADERS - 800;
+                bonus = 2;
             }
             else if (inclination < FLAT_INCLINATION + 15){
                 time_update_invaders = TIME_UPDATE_INVADERS - 1100;
+                bonus = 3;
             }
             else{
                 time_update_invaders = TIME_UPDATE_INVADERS - 1500;
+                bonus = 4;
             }
+            txtBonus.setText("Bonus et vitesse : "+String.valueOf(bonus));
         }
 
     }
@@ -319,7 +419,8 @@ public class GameActivity extends Activity implements SensorEventListener{
                 Invader invader = invaderIterator.next();
 
                 if(laser.isInvaderTouched(invader)){
-                    invader.destroyInvader();
+                    score = invader.destroyInvader(score, bonus);
+                    txtScore.setText("Score : "+String.valueOf(score));
                     invaderIterator.remove();
                     touched = true;
                 }
