@@ -38,7 +38,7 @@ public class Lazor {
     }
 
     private int getInitalTopFromPosition(int topShipPosition){
-        return topShipPosition + SIZE_LASER;
+        return topShipPosition + SIZE_LASER + 10;
     }
 
     private void setLayout(){

@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -22,8 +20,6 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import projet.m2dl.com.mdlinvaders.Classes.Invader;
 import projet.m2dl.com.mdlinvaders.Classes.Lazor;
@@ -69,7 +65,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private SystemUiHider mSystemUiHider;
 
     private final int FLAT_INCLINATION = 25;
-    private final int TIME_UPDATE_INVADERS = 2000;
+    private final int TIME_UPDATE_INVADERS = 2500;
     private final int NB_INVADERS_ROW = 3;
     private final int TIME_UPDATE_LASERS = 100;
     private final int BOMB_DELAY = 10000;
@@ -336,7 +332,7 @@ public class GameActivity extends Activity implements SensorEventListener{
 
     public void isGameOver(Invader invader){
         if (invader.getTop()+invader.SIZE_INVADER > spaceShip.getMarginTopSpaceship()){
-            System.out.println("FIN DE LA PARTIE");
+            //System.out.println("FIN DE LA PARTIE");
         }
     }
 
@@ -403,7 +399,7 @@ public class GameActivity extends Activity implements SensorEventListener{
             laser.updatePosition();
         }
 
-        if(cptLaser == 9){
+        if(cptLaser == 4){
             Lazor laser = new Lazor(this, spaceShip.getMarginLeftSpaceShip(), spaceShip.getMarginTopSpaceship());
             lasers.add(laser);
             rootView.addView(laser.getImageView());

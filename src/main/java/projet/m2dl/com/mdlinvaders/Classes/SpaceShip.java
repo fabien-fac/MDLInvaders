@@ -19,6 +19,7 @@ public class SpaceShip {
     private static final int MARGIN_BOTTOM_SPACESHIP = 25;
     private DisplayMetrics metrics;
     private int marginLeftSpaceShip, marginTopSpaceship;
+    private int left = 0;
 
     public SpaceShip(Context context, ImageView imgSpaceShip, DisplayMetrics metrics){
         this.context = context;
@@ -30,6 +31,7 @@ public class SpaceShip {
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(SIZE_SPACESHIP, SIZE_SPACESHIP);
         layoutParams.setMargins(marginLeftSpaceShip, marginTopSpaceship,0,0);
         imgSpaceShip.setLayoutParams(layoutParams);
+        left = marginLeftSpaceShip;
     }
 
     public View.OnTouchListener moveSpaceShip = new View.OnTouchListener() {
@@ -41,7 +43,8 @@ public class SpaceShip {
             }
             if (arg1.getAction()==MotionEvent.ACTION_MOVE) {
                 if ((arg1.getRawX() - marginLeftSpaceShip)>0 && (arg1.getRawX() - marginLeftSpaceShip)<(metrics.widthPixels-SIZE_SPACESHIP)){
-                    layout.leftMargin = (int) arg1.getRawX() - marginLeftSpaceShip;
+                    left = (int) arg1.getRawX() - marginLeftSpaceShip;
+                    layout.leftMargin = left;
                 }
             }
             imgSpaceShip.setLayoutParams(layout);
@@ -50,7 +53,7 @@ public class SpaceShip {
     };
 
     public int getMarginLeftSpaceShip() {
-        return marginLeftSpaceShip;
+        return left;
     }
 
     public int getMarginTopSpaceship() {
