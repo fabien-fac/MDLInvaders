@@ -5,12 +5,21 @@ import projet.m2dl.com.mdlinvaders.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 /**
@@ -19,7 +28,7 @@ import android.widget.RelativeLayout;
  *
  * @see SystemUiHider
  */
-public class GameActivity extends Activity {
+public class GameActivity extends Activity implements SensorEventListener {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -49,6 +58,11 @@ public class GameActivity extends Activity {
     private SystemUiHider mSystemUiHider;
 
     private RelativeLayout rootView;
+    private ArrayList<Invader> invaders = new ArrayList<>();
+    private final int NB_INVADERS_ROW = 4;
+    Timer timer;
+    MyTimerTask myTimerTask;
+    private SensorManager sensorManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +123,13 @@ public class GameActivity extends Activity {
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
 
-        displayInvaders();
+        sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
+        // add listener. The listener will be  (this) class
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                SensorManager.SENSOR_DELAY_NORMAL);
+
+        launchTimer();
     }
 
     @Override
@@ -155,8 +175,73 @@ public class GameActivity extends Activity {
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
     }
 
+    private void launchTimer(){
+        timer = new Timer();
+        myTimerTask = new MyTimerTask();
+        timer.schedule(myTimerTask, 0, 2000);
+    }
+
     private void displayInvaders(){
-        Invader in1 = new Invader(this, 0);
-        rootView.addView(in1.getImageView());
+
+        Iterator<Invader> invaderIterator = invaders.iterator();
+        while (invaderIterator.hasNext()){
+            Invader invader = invaderIterator.next();
+            invader.updateLigne();
+        }
+        for(int i=0; i<NB_INVADERS_ROW; i++){
+            Invader invader = new Invader(this, i);
+            invaders.add(invader);
+            rootView.addView(invader.getImageView());
+        }
+
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(event.sensor.getType()==Sensor.TYPE_ACCELEROMETER){
+            getAccelerometer(event);
+        }
+    }
+
+    private void getAccelerometer(SensorEvent event) {
+        float[] g = new float[3];
+        g = event.values.clone();
+
+        double norm_Of_g = Math.sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2]);
+
+        // Normalize the accelerometer vector
+        g[0] = (float) (g[0] / norm_Of_g);
+        g[1] = (float) (g[1] / norm_Of_g);
+        g[2] = (float) (g[2] / norm_Of_g);
+
+        int inclination = (int) Math.round(Math.toDegrees(Math.acos(g[2])));
+        if (inclination < 25 || inclination > 155)
+        {
+            System.out.println("device is flat");
+        }
+        else
+        {
+            System.out.println("device is not flat");
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    class MyTimerTask extends TimerTask {
+
+        @Override
+        public void run() {
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    displayInvaders();
+                }
+            });
+        }
+
     }
 }
