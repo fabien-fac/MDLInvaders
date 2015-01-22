@@ -71,7 +71,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private final int FLAT_INCLINATION = 25;
     private final int TIME_UPDATE_INVADERS = 2000;
     private final int NB_INVADERS_ROW = 3;
-    private final int TIME_UPDATE_LASERS = 200;
+    private final int TIME_UPDATE_LASERS = 100;
     private final int BOMB_DELAY = 10000;
 
     private RelativeLayout rootView;
@@ -397,7 +397,7 @@ public class GameActivity extends Activity implements SensorEventListener{
             laser.updatePosition();
         }
 
-        if(cptLaser == 4){
+        if(cptLaser == 9){
             Lazor laser = new Lazor(this, spaceShip.getMarginLeftSpaceShip(), spaceShip.getMarginTopSpaceship());
             lasers.add(laser);
             rootView.addView(laser.getImageView());
