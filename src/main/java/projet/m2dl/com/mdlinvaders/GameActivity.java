@@ -73,7 +73,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private final int NB_INVADERS_ROW = 3;
     private final int TIME_UPDATE_LASERS = 100;
     private final int BOMB_DELAY = 10000;
-
+    private final int VOLUME_BLOW = 15000;
     private RelativeLayout rootView;
     private SpaceShip spaceShip;
     private DisplayMetrics metrics;
@@ -274,11 +274,10 @@ public class GameActivity extends Activity implements SensorEventListener{
         public void run() {
             double volume = getAmplitude();
             if (bombAvailable){
-                if (volume > 25000){
+                if (volume > VOLUME_BLOW){
                     bombAvailable = false;
                     launchBombDisabledTimer();
-                    destroyAllInvaders();
-                    System.out.println("Volume : " + volume);
+                    //destroyAllInvaders();
                 }
             }
            handlerAudioRecord.postDelayed(audioRecordRunnable, 100);
@@ -324,6 +323,7 @@ public class GameActivity extends Activity implements SensorEventListener{
             }
             else{
                 invader.updateLigne();
+                isGameOver(invader);
             }
         }
         for(int i=0; i<NB_INVADERS_ROW; i++){
@@ -331,6 +331,12 @@ public class GameActivity extends Activity implements SensorEventListener{
             invaders.add(invader);
             //rootView.addView(invader.getImageView());
             rootView.addView(invader.getImageView());
+        }
+    }
+
+    public void isGameOver(Invader invader){
+        if (invader.getTop()+invader.SIZE_INVADER > spaceShip.getMarginTopSpaceship()){
+            System.out.println("FIN DE LA PARTIE");
         }
     }
 
