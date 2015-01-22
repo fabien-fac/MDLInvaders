@@ -87,7 +87,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private SensorManager sensorManager;
     private int time_update_invaders = TIME_UPDATE_INVADERS;
     private MediaRecorder mRecorder = null;
-
+    private boolean isGameOver = false;
     private int cptLaser = 0;
 
     private boolean bombAvailable = true;
@@ -279,7 +279,7 @@ public class GameActivity extends Activity implements SensorEventListener{
                 if (volume > VOLUME_BLOW){
                     bombAvailable = false;
                     launchBombDisabledTimer();
-                    //destroyAllInvaders();
+                    destroyAllInvaders();
                 }
             }
            handlerAudioRecord.postDelayed(audioRecordRunnable, 100);
@@ -331,13 +331,13 @@ public class GameActivity extends Activity implements SensorEventListener{
         for(int i=0; i<NB_INVADERS_ROW; i++){
             Invader invader = new Invader(this, i);
             invaders.add(invader);
-            //rootView.addView(invader.getImageView());
             rootView.addView(invader.getImageView());
         }
     }
 
     public void isGameOver(Invader invader){
         if (invader.getTop()+invader.SIZE_INVADER > spaceShip.getMarginTopSpaceship()){
+            isGameOver = true;
             AlertDialog.Builder msgTouchBuilder = new AlertDialog.Builder(this);
             msgTouchBuilder.setTitle("Fin de la partie");
             msgTouchBuilder.setMessage("Score : " + score);
