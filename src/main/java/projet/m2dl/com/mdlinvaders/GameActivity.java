@@ -64,6 +64,7 @@ public class GameActivity extends Activity implements SensorEventListener{
     private SystemUiHider mSystemUiHider;
 
     private final int FLAT_INCLINATION = 25;
+    private final int TIME_UPDATE_INVADERS = 2000;
 
     private RelativeLayout rootView;
     private SpaceShip spaceShip;
@@ -73,9 +74,9 @@ public class GameActivity extends Activity implements SensorEventListener{
     private DisplayMetrics metrics;
     private ArrayList<Invader> invaders = new ArrayList<>();
     private final int NB_INVADERS_ROW = 4;
-    Timer timer;
-    MyTimerTask myTimerTask;
+    Handler handlerInvaders = new Handler();
     private SensorManager sensorManager;
+    private int time_update_invaders = TIME_UPDATE_INVADERS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -234,10 +235,16 @@ public class GameActivity extends Activity implements SensorEventListener{
     }
 
     private void launchTimer(){
-        timer = new Timer();
-        myTimerTask = new MyTimerTask();
-        timer.schedule(myTimerTask, 0, 2000);
+        handlerInvaders.postDelayed(invadersRunnable, time_update_invaders);
     }
+
+    private Runnable invadersRunnable = new Runnable() {
+        @Override
+        public void run() {
+            displayInvaders();
+            handlerInvaders.postDelayed(invadersRunnable, time_update_invaders);
+        }
+    };
 
     private void displayInvaders(){
 
@@ -274,33 +281,34 @@ public class GameActivity extends Activity implements SensorEventListener{
 
         int inclination = (int) Math.round(Math.toDegrees(Math.acos(g[2])));
 
-        if (inclination < (FLAT_INCLINATION - 10) || inclination > (FLAT_INCLINATION + 10))
+        calculateNewTimer(inclination);
+    }
+
+    private void calculateNewTimer(int inclination) {
+        if (inclination < FLAT_INCLINATION)
         {
-            System.out.println("device is flat : " + inclination);
+            time_update_invaders = TIME_UPDATE_INVADERS;
         }
         else
         {
-            System.out.println("device is not flat : " + inclination);
+            if(inclination < FLAT_INCLINATION + 5){
+                time_update_invaders = TIME_UPDATE_INVADERS - 300;
+            }
+            else if (inclination < FLAT_INCLINATION + 10){
+                time_update_invaders = TIME_UPDATE_INVADERS - 800;
+            }
+            else if (inclination < FLAT_INCLINATION + 15){
+                time_update_invaders = TIME_UPDATE_INVADERS - 1100;
+            }
+            else{
+                time_update_invaders = TIME_UPDATE_INVADERS - 1500;
+            }
         }
+
     }
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-    }
-
-    class MyTimerTask extends TimerTask {
-
-        @Override
-        public void run() {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    displayInvaders();
-                }
-            });
-        }
 
     }
 }
