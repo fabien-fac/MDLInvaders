@@ -421,6 +421,7 @@ public class GameActivity extends Activity implements SensorEventListener{
                 if(laser.isInvaderTouched(invader)){
                     score = invader.destroyInvader(score, bonus);
                     txtScore.setText("Score : "+String.valueOf(score));
+                    rootView.removeView(invader.getImageView());
                     invaderIterator.remove();
                     touched = true;
                 }
