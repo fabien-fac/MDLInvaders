@@ -1,5 +1,6 @@
 package projet.m2dl.com.mdlinvaders;
 
+import projet.m2dl.com.mdlinvaders.Classes.Invader;
 import projet.m2dl.com.mdlinvaders.util.SystemUiHider;
 
 import android.annotation.TargetApi;
@@ -107,6 +108,8 @@ public class GameActivity extends Activity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
+
+        displayInvaders();
     }
 
     @Override
@@ -150,5 +153,10 @@ public class GameActivity extends Activity {
     private void delayedHide(int delayMillis) {
         mHideHandler.removeCallbacks(mHideRunnable);
         mHideHandler.postDelayed(mHideRunnable, delayMillis);
+    }
+
+    private void displayInvaders(){
+        Invader in1 = new Invader(this, 0);
+        rootView.addView(in1.getImageView());
     }
 }
