@@ -26,6 +26,7 @@ public class Invader {
     private int top = MIN_TOP;
     private int left = 0;
     private int ligne = 0;
+    private boolean isDestroy = false;
 
     public Invader(Context context, int position){
         this.context = context;
@@ -89,5 +90,33 @@ public class Invader {
 
         top = (ligne*SIZE_INVADER + MIN_TOP + HEIGHT_BETWEEN_INVADERS);
         setLayout();
+    }
+
+    public boolean isInvaderDestroyed(){
+        return isDestroy;
+    }
+
+    public void destroyInvader(){
+        imageView.setImageBitmap(BitmapFactory.decodeResource(context.getResources(), getRandomExplosion()));
+        isDestroy = true;
+    }
+
+    public int getRandomExplosion(){
+        Random r = new Random();
+        int val = r.nextInt(2 - 0) + 0;
+        int invader;
+
+        switch (val){
+            case 0:
+                invader = R.drawable.explosion1;
+                break;
+            case 1:
+                invader = R.drawable.explosion2;
+                break;
+            default:
+                invader = R.drawable.explosion1;
+        }
+
+        return invader;
     }
 }

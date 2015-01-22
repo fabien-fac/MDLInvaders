@@ -210,7 +210,12 @@ public class GameActivity extends Activity implements SensorEventListener{
         Iterator<Invader> invaderIterator = invaders.iterator();
         while (invaderIterator.hasNext()){
             Invader invader = invaderIterator.next();
-            invader.updateLigne();
+            if(invader.isInvaderDestroyed()){
+                invaderIterator.remove();
+            }
+            else{
+                invader.updateLigne();
+            }
         }
         for(int i=0; i<NB_INVADERS_ROW; i++){
             Invader invader = new Invader(this, i);
